@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Plus, FolderOpen, Trash2, Calendar, Eye } from 'lucide-react';
+import { FileText, Plus, FolderOpen, Trash2, Calendar, Eye, LogOut } from 'lucide-react';
 import { useIsMobileOrTablet } from './hooks/useMediaQuery';
 
 interface SavedPage {
@@ -22,9 +22,10 @@ interface LandingPageProps {
   onOpenRecommendedArticles?: () => void;
   onOpenDraftLibrary?: () => void;
   onOpenGlitchDemo?: () => void;
+  onLogout?: () => void;
 }
 
-export default function LandingPage({ onCreateNew, onLoadDraft, savedPages, onDeleteDraft, onOpenFeaturedProducts, onOpenRecommendedArticles, onOpenDraftLibrary, onOpenGlitchDemo }: LandingPageProps) {
+export default function LandingPage({ onCreateNew, onLoadDraft, savedPages, onDeleteDraft, onOpenFeaturedProducts, onOpenRecommendedArticles, onOpenDraftLibrary, onOpenGlitchDemo, onLogout }: LandingPageProps) {
   const isMobileOrTablet = useIsMobileOrTablet();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [hoveredDraft, setHoveredDraft] = useState<string | null>(null);
@@ -74,17 +75,35 @@ export default function LandingPage({ onCreateNew, onLoadDraft, savedPages, onDe
   };
 
   return (
-    <div 
-      className={`min-h-screen flex flex-col items-center justify-center ${isMobileOrTablet ? 'p-[20px]' : 'p-[40px]'}`}
-      style={{
-        backgroundColor: '#1a1a1a',
-        fontFamily: "'Inter', sans-serif"
-      }}
-    >
-      {/* Header */}
-      <div className="text-center mb-[60px]">
-        <h1 
-          className="m-0 mb-[16px]"
+    <>
+      <nav className="fixed top-0 left-0 right-0 h-16 bg-[#1a1a1a] border-b border-[#333] flex items-center justify-end px-6 z-[9999]">
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="flex items-center gap-2 px-4 py-2 hover:bg-[#333] rounded-lg transition-colors cursor-pointer"
+            style={{
+              border: '1px solid #00ff00',
+              color: '#00ff00',
+              marginTop: '10px'
+            }}
+          >
+            <LogOut size={18} />
+            <span className="font-medium">Logout</span>
+          </button>
+        )}
+      </nav>
+      <div 
+        className={`min-h-screen flex flex-col items-center justify-center ${isMobileOrTablet ? 'p-[20px]' : 'p-[40px]'} pt-20 relative`}
+        style={{
+          backgroundColor: '#1a1a1a',
+          fontFamily: "'Inter', sans-serif"
+        }}
+      >
+        {/* Header */}
+        <div className="text-center mb-[60px]">
+          <h1 
+            className="m-0 mb-[16px]"
           style={{
             fontSize: isMobileOrTablet ? '32px' : '48px',
             fontWeight: '700',
@@ -658,5 +677,6 @@ export default function LandingPage({ onCreateNew, onLoadDraft, savedPages, onDe
         </div>
       )}
     </div>
+    </>
   );
 }

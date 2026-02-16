@@ -7,6 +7,7 @@ import RecommendedArticlesDashboard from './components/RecommendedArticlesDashbo
 import DraftLibrary from './components/DraftLibrary';
 import GlitchDemo from './components/GlitchDemo';
 import FeedPage from './feedexternal/Feed';
+import Login from './components/Login';
 
 interface SavedPage {
   id: string;
@@ -48,7 +49,31 @@ interface SavedPage {
 
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'featuredProducts' | 'recommendedArticles' | 'draftLibrary' | 'publishedLibrary' | 'glitchDemo' | 'feed'>('landing');
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('isAuthenticated') === 'true';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem('isAuthenticated', 'true');
+    } else {
+      localStorage.removeItem('isAuthenticated');
+    }
+  }, [isAuthenticated]);
+  
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'featuredProducts' | 'recommendedArticles' | 'draftLibrary' | 'publishedLibrary' | 'glitchDemo' | 'feed'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash;
+      if (path.startsWith('/feed') || hash.startsWith('#article-')) {
+        return 'feed';
+      }
+    }
+    return 'landing';
+  });
   const [savedPages, setSavedPages] = useState<SavedPage[]>([]);
   const [loadedPageId, setLoadedPageId] = useState<string | null>(null);
 
@@ -194,6 +219,21 @@ export default function App() {
     setCurrentView('glitchDemo');
   };
 
+  // If we are on the feed, show it regardless of auth
+  if (currentView === 'feed') {
+    return (
+      <FeedPage
+        savedPages={savedPages}
+        onBackToLanding={handleBackToLanding}
+      />
+    );
+  }
+
+  // For all other views, require authentication
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   if (currentView === 'landing') {
     return (
       <LandingPage
@@ -205,6 +245,7 @@ export default function App() {
         onOpenRecommendedArticles={handleOpenRecommendedArticles}
         onOpenDraftLibrary={handleOpenDraftLibrary}
         onOpenGlitchDemo={handleOpenGlitchDemo}
+        onLogout={() => setIsAuthenticated(false)}
       />
     );
   }
@@ -276,15 +317,6 @@ export default function App() {
     return (
       <GlitchDemo
         onBack={handleOpenDraftLibrary}
-      />
-    );
-  }
-
-  if (currentView === 'feed') {
-    return (
-      <FeedPage
-        savedPages={savedPages}
-        onBackToLanding={handleBackToLanding}
       />
     );
   }

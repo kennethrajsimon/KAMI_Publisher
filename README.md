@@ -18,7 +18,7 @@ From the project root:
 
 ```bash
 npm install
-npx vite --config vite.config.new.ts
+npx vite --config vite.config.ts
 ```
 
 Frontend runs at:
@@ -35,7 +35,7 @@ node server/server.js
 Terminal 2:
 
 ```bash
-npx vite --config vite.config.new.ts
+npx vite --config vite.config.ts
 ```
 
 ## Notes
